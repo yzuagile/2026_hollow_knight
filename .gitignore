@@ -1,0 +1,77 @@
+# =========================
+# Unity generated folders
+# =========================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+
+# =========================
+# User-specific files
+# =========================
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor files
+# =========================
+.vscode/
+.vs/
+.idea/
+
+# =========================
+# Crash & backup
+# =========================
+*.stackdump
+*.bak
+*.tmp
+
+# =========================
+# Addressables / StreamingAssets cache
+# （可選，若有用 Addressables）
+# =========================
+# Assets/AddressableAssetsData/*/*.bin
+# Assets/AddressableAssetsData/*/*.json
+
+# =========================
+# IMPORTANT:
+# DO NOT ignore:
+# Assets/
+# ProjectSettings/
+# Packages/
+# *.meta
+# =========================
+
+# ========== UserSettings ==========
+UserSettings/
+
+# ========== 忽略大型資源內容 ==========
+Assets/BigEnvironment/*
+
+# 但保留 meta（很重要）
+!Assets/BigEnvironment.meta
+!Assets/BigEnvironment/**/*.meta
+
+# Ignore Interiors_A content
+Assets/LoafbrrAssets/Interiors_A/*
+!Assets/LoafbrrAssets/Interiors_A.meta
+!Assets/LoafbrrAssets/Interiors_A/**/*.meta
+
+# Ignore Polygon office content
+Assets/Enviroment/enviroment/*
+!Assets/Enviroment/enviroment.meta
+!Assets/Enviroment/enviroment/**/*.meta
