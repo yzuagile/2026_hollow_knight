@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private InputSystem_Actions controls;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
 
     private Vector2 moveInput;
     private bool jumpPressed;
@@ -23,6 +25,9 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
         controls = new InputSystem_Actions();
 
         // 移動（Vector2）
@@ -53,9 +58,25 @@ public class PlayerController : MonoBehaviour
         controls.Disable();
     }
 
+    private void Update()
+    {
+        // 動畫速度參數：左右移動時切換 Idle / Run
+        animator.SetFloat("Speed", Mathf.Abs(moveInput.x));
+
+        // 左右翻面
+        if (moveInput.x > 0.01f)
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if (moveInput.x < -0.01f)
+        {
+            spriteRenderer.flipX = true;
+        }
+    }
+
     private void FixedUpdate()
     {
-        // 只用 x 控制左右
+        // 左右移動
         rb.linearVelocity = new Vector2(moveInput.x * moveSpeed, rb.linearVelocity.y);
 
         // 跳躍
