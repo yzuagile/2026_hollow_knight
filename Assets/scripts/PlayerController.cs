@@ -22,6 +22,9 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private bool jumpPressed;
 
+    // 1 = 朝右, -1 = 朝左
+    public int FacingDirection { get; private set; } = 1;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -61,16 +64,19 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         // 動畫速度參數：左右移動時切換 Idle / Run
-        animator.SetFloat("Speed", Mathf.Abs(moveInput.x));
+        if (animator != null)
+            animator.SetFloat("Speed", Mathf.Abs(moveInput.x));
 
-        // 左右翻面
+        // 左右翻面 + 更新朝向
         if (moveInput.x > 0.01f)
         {
             spriteRenderer.flipX = false;
+            FacingDirection = 1;
         }
         else if (moveInput.x < -0.01f)
         {
             spriteRenderer.flipX = true;
+            FacingDirection = -1;
         }
     }
 
