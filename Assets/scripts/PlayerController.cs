@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 moveInput;
     private bool jumpPressed;
+    public bool IsBlocking { get; private set; }
+
+    private Color originalColor;
 
     // 1 = 朝右, -1 = 朝左
     public int FacingDirection { get; private set; } = 1;
@@ -30,7 +33,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
+        originalColor = spriteRenderer.color;
         controls = new InputSystem_Actions();
 
         // 移動（Vector2）
@@ -77,6 +80,17 @@ public class PlayerController : MonoBehaviour
         {
             spriteRenderer.flipX = true;
             FacingDirection = -1;
+        }
+        // 新版 Input System 的快速偵測鍵盤方式
+        if (Keyboard.current.gKey.isPressed)
+        {
+            IsBlocking = true;
+            spriteRenderer.color = Color.cyan;
+        }
+        else
+        {
+            IsBlocking = false;
+            spriteRenderer.color = originalColor;
         }
     }
 
