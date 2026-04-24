@@ -864,8 +864,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4669d74ae0433b4b824a918281917e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAwake
-  player: {fileID: 742544591}
   detectDistance: 2
+  moveSpeed: 2
 --- !u!1 &742544590
 GameObject:
   m_ObjectHideFlags: 0
@@ -1107,6 +1107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cce3bef5e94561041bf2f74d113acc61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
+  moveAction: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   attackAction: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   skillAction: {fileID: 7541840496664255643, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   attackPoint: {fileID: 2054470114}
@@ -1114,14 +1115,67 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   animator: {fileID: 0}
-  attackDamage: 1
-  attackSize: {x: 1, y: 0.8}
-  attackCooldown: 0.3
-  attackOffsetX: 0.8
-  skillDamage: 3
-  skillSize: {x: 1.5, y: 1.2}
+  comboAttacks:
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  comboResetTime: 0.8
+  upAttack:
+    name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  downAttack:
+    name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  directionThreshold: 0.5
+  skillHitBox:
+    size: {x: 1.5, y: 1.2}
+    offset: {x: 1, y: 0}
+    damage: 3
+    drawDuration: 0.15
   skillCooldown: 2
-  skillOffsetX: 1
+  skillDuration: 0.5
+  skillHitDelay: 0.15
 --- !u!1 &745716130
 GameObject:
   m_ObjectHideFlags: 0
