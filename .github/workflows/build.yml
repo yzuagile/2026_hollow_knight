@@ -54,7 +54,7 @@ jobs:
               "text": "Build Status: ${{ job.status }}",
               "attachments": [
                 {
-                  "color": "${{ job.status == 'success' ? 'good' : 'danger' }}",
+                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
                   "fields": [
                     {
                       "title": "Repo",
