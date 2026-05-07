@@ -83,11 +83,13 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current.gKey.isPressed)
         {
             IsBlocking = true;
+            animator.SetBool("isBlock", true);
             spriteRenderer.color = Color.cyan;
         }
         else
         {
             IsBlocking = false;
+            animator.SetBool("isBlock", false);
             spriteRenderer.color = originalColor;
         }
     }
