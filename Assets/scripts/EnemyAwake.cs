@@ -4,17 +4,17 @@ public class EnemyAwake : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float detectDistance = 5f;
-    [SerializeField] private float moveSpeed = 2f; // ���ʳt��
-    [SerializeField] private GameObject Enemy;
+    [SerializeField] private float moveSpeed = 2f;
 
     private Transform player;
     private Animator animator;
+    private Rigidbody2D rb; // 必須使用它來移動
 
     private void Awake()
     {
-        animator = Enemy.GetComponentInChildren<Animator>();
+        animator = GetComponentInChildren<Animator>();
+        rb = GetComponent<Rigidbody2D>(); // 取得 Rigidbody
 
-        // ۰ʴMҬ "Player"
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null) player = playerObj.transform;
     }
@@ -27,37 +27,32 @@ public class EnemyAwake : MonoBehaviour
 
         if (distance < detectDistance)
         {
-            // 1. ����ʵe
             animator.SetBool("awake", true);
-
-            // 2. ���沾��
             MoveTowardsPlayer();
-
-            // 3. (��t) ���ĤH��V���a
             FlipSprite();
         }
         else
         {
             animator.SetBool("awake", false);
+            // 沒看到人時，把速度歸零，否則牠會滑行
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         }
     }
 
     private void MoveTowardsPlayer()
     {
-        // �p��s��m�G�q���e��m�����a��m����
-        transform.position = Vector2.MoveTowards(
-            transform.position,
-            player.position,
-            moveSpeed * Time.deltaTime
-        );
+        // 決定方向：1 是右，-1 是左
+        float direction = (player.position.x > transform.position.x) ? 1f : -1f;
+
+        // 【關鍵改動】使用物理速度移動，保留原本的 Y 軸速度（受重力影響）
+        rb.linearVelocity = new Vector2(direction * moveSpeed, rb.linearVelocity.y);
     }
 
     private void FlipSprite()
     {
-        // �ھڪ��a�b�����٬O�k��A½��Ϥ�
-        if (player.position.x > Enemy.transform.position.x)
-            Enemy.transform.localScale = new Vector3(1, 1, 1); // Vk
+        if (player.position.x > transform.position.x)
+            transform.localScale = new Vector3(1, 1, 1);
         else
-            Enemy.transform.localScale = new Vector3(-1, 1, 1); // V
+            transform.localScale = new Vector3(-1, 1, 1);
     }
 }
