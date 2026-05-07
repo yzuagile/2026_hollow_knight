@@ -4,16 +4,17 @@ public class EnemyAwake : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float detectDistance = 5f;
-    [SerializeField] private float moveSpeed = 2f; // ²¾°Ê³t«×
+    [SerializeField] private float moveSpeed = 2f; // ï¿½ï¿½ï¿½Ê³tï¿½ï¿½
+    [SerializeField] private GameObject Enemy;
 
     private Transform player;
     private Animator animator;
 
     private void Awake()
     {
-        animator = GetComponentInChildren<Animator>();
+        animator = Enemy.GetComponentInChildren<Animator>();
 
-        // ¦Û°Ê´M§ä¼ÐÅÒ¬° "Player" ªºª«¥ó
+        // Û°Ê´MÒ¬ "Player"
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null) player = playerObj.transform;
     }
@@ -26,13 +27,13 @@ public class EnemyAwake : MonoBehaviour
 
         if (distance < detectDistance)
         {
-            // 1. ¼½©ñ°Êµe
+            // 1. ï¿½ï¿½ï¿½ï¿½Êµe
             animator.SetBool("awake", true);
 
-            // 2. °õ¦æ²¾°Ê
+            // 2. ï¿½ï¿½ï¿½æ²¾ï¿½ï¿½
             MoveTowardsPlayer();
 
-            // 3. (¿ï°t) Åý¼Ä¤HÂà¦Vª±®a
+            // 3. (ï¿½ï¿½t) ï¿½ï¿½ï¿½Ä¤Hï¿½ï¿½Vï¿½ï¿½ï¿½a
             FlipSprite();
         }
         else
@@ -43,7 +44,7 @@ public class EnemyAwake : MonoBehaviour
 
     private void MoveTowardsPlayer()
     {
-        // ­pºâ·s¦ì¸m¡G±q·í«e¦ì¸m©¹ª±®a¦ì¸m²¾°Ê
+        // ï¿½pï¿½ï¿½sï¿½ï¿½mï¿½Gï¿½qï¿½ï¿½ï¿½eï¿½ï¿½mï¿½ï¿½ï¿½ï¿½ï¿½aï¿½ï¿½mï¿½ï¿½ï¿½ï¿½
         transform.position = Vector2.MoveTowards(
             transform.position,
             player.position,
@@ -53,10 +54,10 @@ public class EnemyAwake : MonoBehaviour
 
     private void FlipSprite()
     {
-        // ®Ú¾Úª±®a¦b¥ªÃäÁÙ¬O¥kÃä¡AÂ½Âà¹Ï¤ù
-        if (player.position.x > transform.position.x)
-            transform.localScale = new Vector3(1, 1, 1); // ­±¦V¥k
+        // ï¿½Ú¾Úªï¿½ï¿½aï¿½bï¿½ï¿½ï¿½ï¿½ï¿½Ù¬Oï¿½kï¿½ï¿½AÂ½ï¿½ï¿½Ï¤ï¿½
+        if (player.position.x > Enemy.transform.position.x)
+            Enemy.transform.localScale = new Vector3(1, 1, 1); // Vk
         else
-            transform.localScale = new Vector3(-1, 1, 1); // ­±¦V¥ª
+            Enemy.transform.localScale = new Vector3(-1, 1, 1); // V
     }
 }

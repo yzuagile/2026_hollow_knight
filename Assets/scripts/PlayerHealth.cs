@@ -43,6 +43,7 @@ public class PlayerHealth : MonoBehaviour
             // 如果玩家朝向等於敵人方位，格擋成功
             if (playerController.FacingDirection == directionToAttacker)
             {
+                AudioManager.instance.blocksuccess(); // 播放格擋成功的音效 
                 Debug.Log("完美格擋！不扣血");
                 // 這裡可以播放一個「鏘」的音效或藍色閃光
                 return;
