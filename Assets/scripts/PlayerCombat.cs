@@ -293,7 +293,7 @@ public class PlayerCombat : MonoBehaviour
 
         foreach (Collider2D hit in hits)
         {
-            IDamageable damageable = hit.GetComponent<IDamageable>();
+            EnemyHealth damageable = hit.GetComponent<EnemyHealth>();
 
             if (damageable != null)
             {

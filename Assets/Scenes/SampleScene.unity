@@ -769,7 +769,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 482319580}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cce3bef5e94561041bf2f74d113acc61, type: 3}
   m_Name: 
@@ -781,7 +781,7 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
-  animator: {fileID: 0}
+  animator: {fileID: 482319581}
   attackEffectPrefab: {fileID: 2133963330699298888, guid: 58fb54826615cc74fbd850126b7eeb6e, type: 3}
   spawnEffectOnHitBox: 1
   globalEffectScaleMultiplier: 1
@@ -1447,7 +1447,8 @@ GameObject:
   - component: {fileID: 787018744}
   - component: {fileID: 787018746}
   - component: {fileID: 787018745}
-  m_Layer: 0
+  - component: {fileID: 787018747}
+  m_Layer: 6
   m_Name: EnemyContain
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -1558,6 +1559,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5900746, y: 0.6120526}
   m_EdgeRadius: 0
+--- !u!114 &787018747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787018742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 371c104a6718e2044aa4b3036888ac82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  healthBar: {fileID: 863143543}
 --- !u!1 &791364010
 GameObject:
   m_ObjectHideFlags: 0
@@ -2612,7 +2626,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1805151299}
   - component: {fileID: 1805151296}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
