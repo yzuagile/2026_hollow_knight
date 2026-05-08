@@ -14,7 +14,7 @@ TagManager:
   - UI
   - Enemy
   - 
-  - 
+  - affect
   - 
   - ground
   - 
@@ -41,6 +41,21 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: affect
+    uniqueID: 2865028027
+    locked: 0
+  - name: Player
+    uniqueID: 3288132547
+    locked: 0
+  - name: Enemy
+    uniqueID: 81338853
+    locked: 0
+  - name: ground
+    uniqueID: 2020457265
+    locked: 0
+  - name: Background
+    uniqueID: 2857469925
     locked: 0
   m_RenderingLayers:
   - Default

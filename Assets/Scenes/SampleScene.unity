@@ -219,8 +219,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 81338853
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -1617209406775790638, guid: b6e7625a9c0fc5542a92215f4bd87910, type: 3}
@@ -233,6 +233,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &80446249
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 80446250}
+  m_Layer: 0
+  m_Name: attackArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &80446250
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 80446249}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 482319587}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &383052834
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,8 +503,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 2020457265
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -516,6 +547,7 @@ GameObject:
   - component: {fileID: 482319583}
   - component: {fileID: 482319582}
   - component: {fileID: 482319581}
+  - component: {fileID: 482319588}
   m_Layer: 0
   m_Name: MC
   m_TagString: Player
@@ -620,6 +652,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 5
   jumpForce: 10
+  maxJumpCount: 2
   groundCheck: {fileID: 905589019}
   groundCheckRadius: 0.1
   groundLayer:
@@ -697,8 +730,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1006834749
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 4495478712733764576, guid: ae1a3d3c3976f054c8ee4a67e16086fa, type: 3}
@@ -720,14 +753,162 @@ Transform:
   m_GameObject: {fileID: 482319580}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.113, y: -0.14, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5.0845346, y: 3.5461552, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 905589019}
   - {fileID: 577932306}
+  - {fileID: 80446250}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &482319588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482319580}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cce3bef5e94561041bf2f74d113acc61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
+  moveAction: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  attackAction: {fileID: 1120369429361536294, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  skillAction: {fileID: 7541840496664255643, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  attackPoint: {fileID: 80446250}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  animator: {fileID: 0}
+  attackEffectPrefab: {fileID: 2133963330699298888, guid: 58fb54826615cc74fbd850126b7eeb6e, type: 3}
+  spawnEffectOnHitBox: 1
+  globalEffectScaleMultiplier: 1
+  comboAttacks:
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+      useEffectAspect: 1
+      fitWidthByHeight: 1
+      spawnEffect: 1
+      effectRotationX: 0
+      effectRotationY: 0
+      effectRotationZ: 0
+      effectScaleMultiplier: 1
+      effectOffset: {x: 0, y: 0}
+      flipByFacingDirection: 1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+      useEffectAspect: 1
+      fitWidthByHeight: 1
+      spawnEffect: 1
+      effectRotationX: 0
+      effectRotationY: 0
+      effectRotationZ: 0
+      effectScaleMultiplier: 1
+      effectOffset: {x: 0, y: 0}
+      flipByFacingDirection: 1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+      useEffectAspect: 1
+      fitWidthByHeight: 1
+      spawnEffect: 1
+      effectRotationX: 0
+      effectRotationY: 0
+      effectRotationZ: 0
+      effectScaleMultiplier: 1
+      effectOffset: {x: 0, y: 0}
+      flipByFacingDirection: 1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  - name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+      useEffectAspect: 1
+      fitWidthByHeight: 1
+      spawnEffect: 1
+      effectRotationX: 0
+      effectRotationY: 0
+      effectRotationZ: 0
+      effectScaleMultiplier: 1
+      effectOffset: {x: 0, y: 0}
+      flipByFacingDirection: 1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  comboResetTime: 0.8
+  upAttack:
+    name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+      useEffectAspect: 1
+      fitWidthByHeight: 1
+      spawnEffect: 1
+      effectRotationX: 0
+      effectRotationY: 0
+      effectRotationZ: 0
+      effectScaleMultiplier: 1
+      effectOffset: {x: 0, y: 0}
+      flipByFacingDirection: 1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  downAttack:
+    name: Attack
+    hitBox:
+      size: {x: 1, y: 0.8}
+      offset: {x: 0.8, y: 0}
+      damage: 1
+      drawDuration: 0.1
+      useEffectAspect: 1
+      fitWidthByHeight: 1
+      spawnEffect: 1
+      effectRotationX: 0
+      effectRotationY: 0
+      effectRotationZ: 0
+      effectScaleMultiplier: 1
+      effectOffset: {x: 0, y: 0}
+      flipByFacingDirection: 1
+    attackDuration: 0.35
+    hitDelay: 0.1
+  directionThreshold: 0.5
+  skillHitBox:
+    size: {x: 0, y: 1.2}
+    offset: {x: 1, y: 0}
+    damage: 3
+    drawDuration: 0.15
+    useEffectAspect: 1
+    fitWidthByHeight: 1
+    spawnEffect: 1
+    effectRotationX: 0
+    effectRotationY: 0
+    effectRotationZ: 0
+    effectScaleMultiplier: 1.3
+    effectOffset: {x: 0, y: 0}
+    flipByFacingDirection: 1
+  skillCooldown: 2
+  skillDuration: 0.5
+  skillHitDelay: 0.15
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -860,7 +1041,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.113, y: -0.14, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1041,7 +1222,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 00000000e58751aabbdbc4aa31bb6d78c3ebfcc3e521d904
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -1225,8 +1406,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 2020457265
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -1304,7 +1485,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAwake
   detectDistance: 5
   moveSpeed: 2
-  Enemy: {fileID: 1805151294}
 --- !u!50 &787018745
 Rigidbody2D:
   serializedVersion: 5
@@ -1858,8 +2038,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 2020457265
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -2295,7 +2475,7 @@ Transform:
   m_GameObject: {fileID: 1594531503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.113, y: -0.14, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

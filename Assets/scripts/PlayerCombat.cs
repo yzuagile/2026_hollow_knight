@@ -4,13 +4,44 @@ using UnityEngine.InputSystem;
 
 public class PlayerCombat : MonoBehaviour
 {
+    // 你的攻擊特效圖片比例：1672 x 941
+    private const float EffectAspect = 1672f / 941f;
+
     [System.Serializable]
     public class HitBoxData
     {
+        [Header("Hit Box")]
         public Vector2 size = new Vector2(1f, 0.8f);
         public Vector2 offset = new Vector2(0.8f, 0f);
         public int damage = 1;
         public float drawDuration = 0.1f;
+
+        [Header("Hit Box Aspect")]
+        public bool useEffectAspect = true;
+
+        [Tooltip("打勾：用高度推算寬度。取消：用寬度推算高度。")]
+        public bool fitWidthByHeight = true;
+
+        [Header("Effect")]
+        public bool spawnEffect = true;
+
+        [Tooltip("特效 X 軸旋轉。預設 0。")]
+        public float effectRotationX = 0f;
+
+        [Tooltip("特效 Y 軸旋轉。預設 0。Facing 左邊時，程式會自動加 180。")]
+        public float effectRotationY = 0f;
+
+        [Tooltip("特效 Z 軸旋轉。橫砍 0，上砍 90，下砍 -90。")]
+        public float effectRotationZ = 0f;
+
+        [Tooltip("單招特效大小倍率。覺得某一招太大或太小，就調這裡。")]
+        public float effectScaleMultiplier = 1f;
+
+        [Tooltip("特效位置微調。X 會根據角色左右方向翻轉。")]
+        public Vector2 effectOffset = Vector2.zero;
+
+        [Tooltip("是否根據角色左右方向翻轉特效。")]
+        public bool flipByFacingDirection = true;
     }
 
     [System.Serializable]
@@ -32,6 +63,15 @@ public class PlayerCombat : MonoBehaviour
     public LayerMask enemyLayer;
     public Animator animator;
 
+    [Header("Attack Effect Prefab")]
+    public GameObject attackEffectPrefab;
+
+    [Tooltip("是否生成攻擊特效。")]
+    public bool spawnEffectOnHitBox = true;
+
+    [Tooltip("全域特效大小倍率。覺得整體太大或太小，優先調這裡。")]
+    public float globalEffectScaleMultiplier = 0.4f;
+
     [Header("Combo Attack")]
     public AttackStep[] comboAttacks = new AttackStep[4];
     public float comboResetTime = 0.8f;
@@ -44,10 +84,21 @@ public class PlayerCombat : MonoBehaviour
     [Header("Skill")]
     public HitBoxData skillHitBox = new HitBoxData
     {
-        size = new Vector2(1.5f, 1.2f),
+        size = new Vector2(0f, 1.2f),
         offset = new Vector2(1f, 0f),
         damage = 3,
-        drawDuration = 0.15f
+        drawDuration = 0.15f,
+        useEffectAspect = true,
+        fitWidthByHeight = true,
+        spawnEffect = true,
+
+        effectRotationX = 0f,
+        effectRotationY = 0f,
+        effectRotationZ = 0f,
+
+        effectScaleMultiplier = 1.3f,
+        effectOffset = Vector2.zero,
+        flipByFacingDirection = true
     };
 
     public float skillCooldown = 2f;
@@ -214,10 +265,7 @@ public class PlayerCombat : MonoBehaviour
 
     private void DoHit(HitBoxData hitBox)
     {
-        int dir = 1;
-
-        if (playerController != null)
-            dir = playerController.FacingDirection;
+        int dir = GetFacingDirection();
 
         Vector2 origin = attackPoint != null
             ? (Vector2)attackPoint.position
@@ -230,11 +278,15 @@ public class PlayerCombat : MonoBehaviour
 
         Vector2 center = origin + finalOffset;
 
-        DrawBox(center, hitBox.size, Color.red, hitBox.drawDuration);
+        Vector2 finalSize = GetFinalHitBoxSize(hitBox);
+
+        DrawBox(center, finalSize, Color.red, hitBox.drawDuration);
+
+        SpawnAttackEffect(center, hitBox, dir);
 
         Collider2D[] hits = Physics2D.OverlapBoxAll(
             center,
-            hitBox.size,
+            finalSize,
             0f,
             enemyLayer
         );
@@ -249,6 +301,81 @@ public class PlayerCombat : MonoBehaviour
                 Debug.Log("Hit: " + hit.name);
             }
         }
+    }
+
+    private int GetFacingDirection()
+    {
+        if (playerController != null)
+            return playerController.FacingDirection;
+
+        return transform.localScale.x < 0f ? -1 : 1;
+    }
+
+    private Vector2 GetFinalHitBoxSize(HitBoxData hitBox)
+    {
+        Vector2 finalSize = hitBox.size;
+
+        if (!hitBox.useEffectAspect)
+            return finalSize;
+
+        if (hitBox.fitWidthByHeight)
+        {
+            finalSize.x = finalSize.y * EffectAspect;
+        }
+        else
+        {
+            finalSize.y = finalSize.x / EffectAspect;
+        }
+
+        return finalSize;
+    }
+
+    private void SpawnAttackEffect(Vector2 hitBoxCenter, HitBoxData hitBox, int dir)
+    {
+        if (!spawnEffectOnHitBox)
+            return;
+
+        if (!hitBox.spawnEffect)
+            return;
+
+        if (attackEffectPrefab == null)
+            return;
+
+        Vector2 effectFinalOffset = new Vector2(
+            hitBox.effectOffset.x * dir,
+            hitBox.effectOffset.y
+        );
+
+        Vector2 spawnPosition = hitBoxCenter + effectFinalOffset;
+
+        float finalRotationX = hitBox.effectRotationX;
+        float finalRotationY = hitBox.effectRotationY;
+        float finalRotationZ = hitBox.effectRotationZ;
+
+        if (hitBox.flipByFacingDirection && dir < 0)
+        {
+            finalRotationY += 180f;
+        }
+
+        Quaternion rotation = Quaternion.Euler(
+            finalRotationX,
+            finalRotationY,
+            finalRotationZ
+        );
+
+        GameObject effect = Instantiate(
+            attackEffectPrefab,
+            spawnPosition,
+            rotation
+        );
+
+        float finalScale = globalEffectScaleMultiplier * hitBox.effectScaleMultiplier;
+
+        effect.transform.localScale = new Vector3(
+            finalScale,
+            finalScale,
+            1f
+        );
     }
 
     private void DrawBox(Vector2 center, Vector2 size, Color color, float duration)
@@ -269,16 +396,45 @@ public class PlayerCombat : MonoBehaviour
     private void InitDirectionalAttacks()
     {
         upAttack.name = "Up Attack";
-        upAttack.hitBox.size = new Vector2(0.9f, 1.4f);
-        upAttack.hitBox.offset = new Vector2(0f, 0.9f);
+        upAttack.hitBox.size = new Vector2(2.25f / EffectAspect, 1.5f * EffectAspect);
+        upAttack.hitBox.offset = new Vector2(0.1f, 0.5f);
         upAttack.hitBox.damage = 1;
+        upAttack.hitBox.drawDuration = 0.1f;
+
+        upAttack.hitBox.useEffectAspect = false;
+        upAttack.hitBox.fitWidthByHeight = true;
+
+        upAttack.hitBox.spawnEffect = true;
+        upAttack.hitBox.effectRotationX = 0f;
+        upAttack.hitBox.effectRotationY = 0f;
+        upAttack.hitBox.effectRotationZ = 90f;
+
+        upAttack.hitBox.effectScaleMultiplier = 0.2f;
+        upAttack.hitBox.effectOffset = new Vector2(0.1f, -0.2f);
+        upAttack.hitBox.flipByFacingDirection = true;
+
         upAttack.attackDuration = 0.35f;
         upAttack.hitDelay = 0.1f;
 
+
         downAttack.name = "Down Attack";
-        downAttack.hitBox.size = new Vector2(0.9f, 1.2f);
-        downAttack.hitBox.offset = new Vector2(0f, -0.8f);
+        downAttack.hitBox.size = new Vector2(2.25f / EffectAspect, 1.5f * EffectAspect);
+        downAttack.hitBox.offset = new Vector2(0.1f, 0.2f);
         downAttack.hitBox.damage = 1;
+        downAttack.hitBox.drawDuration = 0.1f;
+
+        downAttack.hitBox.useEffectAspect = false;
+        downAttack.hitBox.fitWidthByHeight = true;
+
+        downAttack.hitBox.spawnEffect = true;
+        downAttack.hitBox.effectRotationX = 0f;
+        downAttack.hitBox.effectRotationY = 180f;
+        downAttack.hitBox.effectRotationZ = -90f;
+
+        downAttack.hitBox.effectScaleMultiplier = 0.2f;
+        downAttack.hitBox.effectOffset = new Vector2(-0.1f, -0.2f);
+        downAttack.hitBox.flipByFacingDirection = true;
+
         downAttack.attackDuration = 0.35f;
         downAttack.hitDelay = 0.1f;
     }
@@ -287,7 +443,7 @@ public class PlayerCombat : MonoBehaviour
     {
         if (comboAttacks == null || comboAttacks.Length != 4)
             comboAttacks = new AttackStep[4];
-
+        comboAttacks = new AttackStep[1];
         for (int i = 0; i < comboAttacks.Length; i++)
         {
             if (comboAttacks[i] == null)
@@ -298,31 +454,23 @@ public class PlayerCombat : MonoBehaviour
         }
 
         comboAttacks[0].name = "Attack 1";
-        comboAttacks[0].hitBox.size = new Vector2(1f, 0.7f);
-        comboAttacks[0].hitBox.offset = new Vector2(0.7f, 0f);
+        comboAttacks[0].hitBox.size = new Vector2(1.5f * EffectAspect, 2.25f / EffectAspect);
+        comboAttacks[0].hitBox.offset = new Vector2(0.5f, -0.2f);
         comboAttacks[0].hitBox.damage = 1;
+        comboAttacks[0].hitBox.drawDuration = 0.1f;
+        comboAttacks[0].hitBox.useEffectAspect = false;
+        comboAttacks[0].hitBox.fitWidthByHeight = true;
+        comboAttacks[0].hitBox.spawnEffect = true;
+
+        comboAttacks[0].hitBox.effectRotationX = 0f;
+        comboAttacks[0].hitBox.effectRotationY = 0f;
+        comboAttacks[0].hitBox.effectRotationZ = 0f;
+
+        comboAttacks[0].hitBox.effectScaleMultiplier = 0.2f;
+        comboAttacks[0].hitBox.effectOffset = new Vector2(-0.1f, 0.0f);
+        comboAttacks[0].hitBox.flipByFacingDirection = true;
         comboAttacks[0].attackDuration = 0.3f;
         comboAttacks[0].hitDelay = 0.08f;
 
-        comboAttacks[1].name = "Attack 2";
-        comboAttacks[1].hitBox.size = new Vector2(1.2f, 0.8f);
-        comboAttacks[1].hitBox.offset = new Vector2(0.8f, 0f);
-        comboAttacks[1].hitBox.damage = 1;
-        comboAttacks[1].attackDuration = 0.35f;
-        comboAttacks[1].hitDelay = 0.1f;
-
-        comboAttacks[2].name = "Attack 3";
-        comboAttacks[2].hitBox.size = new Vector2(1.4f, 0.9f);
-        comboAttacks[2].hitBox.offset = new Vector2(0.9f, 0f);
-        comboAttacks[2].hitBox.damage = 1;
-        comboAttacks[2].attackDuration = 0.4f;
-        comboAttacks[2].hitDelay = 0.12f;
-
-        comboAttacks[3].name = "Attack 4";
-        comboAttacks[3].hitBox.size = new Vector2(1.6f, 1f);
-        comboAttacks[3].hitBox.offset = new Vector2(1f, 0f);
-        comboAttacks[3].hitBox.damage = 2;
-        comboAttacks[3].attackDuration = 0.5f;
-        comboAttacks[3].hitDelay = 0.15f;
     }
 }
