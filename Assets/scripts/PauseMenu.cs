@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem; // 記得加這一行
+using UnityEngine.SceneManagement; // 1. 必須加入這個命名空間才能切換場景
 
 public class PauseMenu : MonoBehaviour
 {
@@ -30,5 +31,15 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0f;
         isPaused = true;
         Cursor.visible = true;
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; // 務必先恢復時間
+        isPaused = false;   // 重置暫停標記
+        
+        // 重新載入當前場景
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Debug.Log("遊戲重啟成功"); 
     }
 }
