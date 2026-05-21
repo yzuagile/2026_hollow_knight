@@ -2454,6 +2454,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   audioSources:
   - {fileID: 1175865913}
+  audioClips:
+  - {fileID: 8300000, guid: be037e51b551fc0438bb20e58a82b07e, type: 3}
 --- !u!82 &1175865913
 AudioSource:
   m_ObjectHideFlags: 0
