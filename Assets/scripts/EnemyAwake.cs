@@ -5,13 +5,14 @@ public class EnemyAwake : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float detectDistance = 5f;
     [SerializeField] private float moveSpeed = 2f;
-
+    [SerializeField] EnemyHealth enemyHealth;
     private Transform player;
     private Animator animator;
     private Rigidbody2D rb; // 必須使用它來移動
 
     private void Awake()
     {
+        enemyHealth = GetComponent<EnemyHealth>();
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>(); // 取得 Rigidbody
 
@@ -22,7 +23,7 @@ public class EnemyAwake : MonoBehaviour
     private void Update()
     {
         if (player == null) return;
-
+        if (Time.time - enemyHealth.lastHitTime <= enemyHealth.stunDuration) return;
         float distance = Vector2.Distance(transform.position, player.position);
 
         if (distance < detectDistance)

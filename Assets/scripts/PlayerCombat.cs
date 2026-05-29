@@ -13,7 +13,10 @@ public class PlayerCombat : MonoBehaviour
         [Header("Hit Box")]
         public Vector2 size = new Vector2(1f, 0.8f);
         public Vector2 offset = new Vector2(0.8f, 0f);
+        public Vector2 forceDir = new Vector2(0f, 1f);
         public int damage = 1;
+        public float knockbackforce = 5f;
+        public float knockbacktime = 0.2f;
         public float drawDuration = 0.1f;
 
         [Header("Hit Box Aspect")]
@@ -87,6 +90,7 @@ public class PlayerCombat : MonoBehaviour
         size = new Vector2(0f, 1.2f),
         offset = new Vector2(1f, 0f),
         damage = 3,
+        knockbackforce = 10f,
         drawDuration = 0.15f,
         useEffectAspect = true,
         fitWidthByHeight = true,
@@ -298,6 +302,7 @@ public class PlayerCombat : MonoBehaviour
             if (damageable != null)
             {
                 damageable.TakeDamage(hitBox.damage);
+                damageable.TakeKnockback(hitBox.knockbackforce, new Vector2(hitBox.forceDir.x * dir, hitBox.forceDir.y));
                 Debug.Log("Hit: " + hit.name);
             }
         }
@@ -399,6 +404,8 @@ public class PlayerCombat : MonoBehaviour
         upAttack.hitBox.size = new Vector2(2.25f / EffectAspect, 1.5f * EffectAspect);
         upAttack.hitBox.offset = new Vector2(0.1f, 0.5f);
         upAttack.hitBox.damage = 1;
+        upAttack.hitBox.forceDir = new Vector2(0.43f, 0.9f);
+        upAttack.hitBox.knockbackforce = 4f;
         upAttack.hitBox.drawDuration = 0.1f;
 
         upAttack.hitBox.useEffectAspect = false;
@@ -421,6 +428,7 @@ public class PlayerCombat : MonoBehaviour
         downAttack.hitBox.size = new Vector2(2.25f / EffectAspect, 1.5f * EffectAspect);
         downAttack.hitBox.offset = new Vector2(0.1f, 0.2f);
         downAttack.hitBox.damage = 1;
+        downAttack.hitBox.forceDir = new Vector2(0f, -1f);
         downAttack.hitBox.drawDuration = 0.1f;
 
         downAttack.hitBox.useEffectAspect = false;
@@ -457,6 +465,7 @@ public class PlayerCombat : MonoBehaviour
         comboAttacks[0].hitBox.size = new Vector2(1.5f * EffectAspect, 2.25f / EffectAspect);
         comboAttacks[0].hitBox.offset = new Vector2(0.5f, -0.2f);
         comboAttacks[0].hitBox.damage = 1;
+        comboAttacks[0].hitBox.forceDir = new Vector2(1f, 0f);
         comboAttacks[0].hitBox.drawDuration = 0.1f;
         comboAttacks[0].hitBox.useEffectAspect = false;
         comboAttacks[0].hitBox.fitWidthByHeight = true;
