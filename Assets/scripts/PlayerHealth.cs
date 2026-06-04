@@ -2,11 +2,20 @@ using System.Drawing;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+
 public class PlayerHealth : MonoBehaviour
 {
     public int currentHealth = 100;
     public Slider healthSlider; // 在 Inspector 把 Slider 拖進來
     public float hitAnimeTime = 0.2f;
+
+    // ─────────────────────────────────────────
+    // [新增] Dash 無敵用的 flag
+    // DashRoutine 開始時設為 true，結束時設回 false
+    // TakeDamage 會直接忽略傷害
+    // ─────────────────────────────────────────
+    [HideInInspector] public bool isInvincible = false;
+
     SpriteRenderer sr;
     private PlayerController playerController; // 引用移動腳本來檢查格擋狀態
 
@@ -35,6 +44,15 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage, Vector3 attackerPosition)
     {
+        // ─────────────────────────────────────────
+        // [新增] 無敵期間直接忽略所有傷害（Dash 用）
+        // ─────────────────────────────────────────
+        if (isInvincible)
+        {
+            Debug.Log("無敵中，傷害無效");
+            return;
+        }
+
         if (playerController != null && playerController.IsBlocking)
         {
             // 計算敵人相對於玩家的方向
@@ -43,15 +61,16 @@ public class PlayerHealth : MonoBehaviour
             // 如果玩家朝向等於敵人方位，格擋成功
             if (playerController.FacingDirection == directionToAttacker)
             {
-                AudioManager.instance.blocksuccess(); // 播放格擋成功的音效 
+                AudioManager.instance.blocksuccess(); // 播放格擋成功的音效
                 Debug.Log("完美格擋！不扣血");
-                // 這裡可以播放一個「鏘」的音效或藍色閃光
                 return;
             }
-            else {
+            else
+            {
                 Debug.Log("格擋方向錯了，被背刺！");
             }
         }
+
         currentHealth -= damage;
         healthSlider.value = currentHealth; // 更新 UI
         Debug.Log("撞到怪了，剩餘血量：" + currentHealth);

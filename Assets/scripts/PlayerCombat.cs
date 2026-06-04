@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -109,6 +109,36 @@ public class PlayerCombat : MonoBehaviour
     public float skillDuration = 0.5f;
     public float skillHitDelay = 0.15f;
 
+    // ─────────────────────────────────────────
+    // [新增] Dash 設定
+    // dashSpeed      : 位移速度，數字越大衝越快
+    // dashDuration   : 最長衝刺時間（秒），時間到自動停
+    // dashCooldown   : 冷卻時間（秒）
+    // dashBodySize   : BoxCast 用的角色碰撞箱大小，依實際角色大小調整
+    // dashObstacleLayer : 勾選「會擋住 Dash 的 Layer」，Enemy 不勾
+    // ─────────────────────────────────────────
+    [Header("Dash (C 鍵)")]
+    public float dashSpeed = 18f;
+    public float dashDuration = 0.2f;
+    public float dashCooldown = 1f;
+    public Vector2 dashBodySize = new Vector2(0.4f, 0.8f);
+
+    [Tooltip("勾選會擋住 Dash 的 Layer。Enemy Layer 不要勾，其他地形、石頭都勾。")]
+    public LayerMask dashObstacleLayer;
+
+    // Dash 冷卻計時器（倒數到 0 才能再次 Dash）
+    private float dashCooldownTimer = 0f;
+
+    // ─────────────────────────────────────────
+    // [新增] 引用 PlayerHealth 以控制無敵狀態
+    // ─────────────────────────────────────────
+    private PlayerHealth playerHealth;
+
+    // ─────────────────────────────────────────
+    // [新增] 用來監聽 C 鍵（Crouch Action）的 Input
+    // ─────────────────────────────────────────
+    private InputSystem_Actions dashInput;
+
     private int comboIndex = 0;
     private bool isAttacking = false;
     private float lastAttackTime = -999f;
@@ -119,9 +149,13 @@ public class PlayerCombat : MonoBehaviour
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
+        playerHealth = GetComponent<PlayerHealth>(); // [新增] 取得 PlayerHealth
 
         if (animator == null)
             animator = GetComponent<Animator>();
+
+        // [新增] 初始化 Dash 用的 Input（監聽 C 鍵 Crouch Action）
+        dashInput = new InputSystem_Actions();
 
         InitDefaultCombo();
         InitDirectionalAttacks();
@@ -143,6 +177,10 @@ public class PlayerCombat : MonoBehaviour
             skillAction.action.performed += OnSkill;
             skillAction.action.Enable();
         }
+
+        // [新增] 啟用 C 鍵 Dash 監聽
+        dashInput.Player.Crouch.performed += OnDash;
+        dashInput.Enable();
     }
 
     private void OnDisable()
@@ -161,12 +199,21 @@ public class PlayerCombat : MonoBehaviour
             skillAction.action.performed -= OnSkill;
             skillAction.action.Disable();
         }
+
+        // [新增] 停用 C 鍵 Dash 監聽
+        dashInput.Player.Crouch.performed -= OnDash;
+        dashInput.Disable();
     }
 
     private void Update()
     {
         if (skillTimer > 0f)
             skillTimer -= Time.deltaTime;
+
+        // [新增] Dash 冷卻倒數
+        if (dashCooldownTimer > 0f)
+            dashCooldownTimer -= Time.deltaTime;
+        dashCooldownTimer = Mathf.Max(0f, dashCooldownTimer - Time.deltaTime);
 
         if (!isAttacking && Time.time - lastAttackTime > comboResetTime)
             comboIndex = 0;
@@ -205,6 +252,20 @@ public class PlayerCombat : MonoBehaviour
             return;
 
         StartCoroutine(SkillRoutine());
+    }
+
+    // ─────────────────────────────────────────
+    // [新增] C 鍵觸發 Dash
+    // isAttacking 或冷卻中都不能觸發
+    // ─────────────────────────────────────────
+    private void OnDash(InputAction.CallbackContext context)
+    {
+        Debug.Log("C鍵，isAttacking=" + isAttacking + " cooldown=" + dashCooldownTimer);
+        
+        if (isAttacking || dashCooldownTimer > 0f)
+            return;
+
+        StartCoroutine(DashRoutine());
     }
 
     private void StartComboAttack()
@@ -263,6 +324,68 @@ public class PlayerCombat : MonoBehaviour
 
         if (remainTime > 0f)
             yield return new WaitForSeconds(remainTime);
+
+        isAttacking = false;
+    }
+
+    // ─────────────────────────────────────────
+    // [新增] Dash 主邏輯
+    //
+    // 流程：
+    //   1. 鎖定 isAttacking，防止 Dash 中再次觸發攻擊或 Dash
+    //   2. 開啟無敵（PlayerHealth.isInvincible = true）
+    //   3. 每個 FixedUpdate 用 BoxCast 往前偵測
+    //      - 碰到 dashObstacleLayer 的物體 → 立即停止
+    //      - 沒碰到 → 繼續移動
+    //   4. 超過 dashDuration 時間 → 自動停止
+    //   5. 關閉無敵，解鎖 isAttacking，重置冷卻計時器
+    // ─────────────────────────────────────────
+    private IEnumerator DashRoutine()
+    {
+        isAttacking = true;
+        dashCooldownTimer = dashCooldown;
+
+        if (playerHealth != null)
+            playerHealth.isInvincible = true;
+
+        // [新增] Dash 期間關掉玩家跟 Enemy layer 的碰撞
+        int playerLayer = gameObject.layer;
+        int enemyLayer_index = LayerMask.NameToLayer("Enemy");
+        Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer_index, true);
+
+        int dir = GetFacingDirection();
+        float elapsed = 0f;
+        float stepDistance = dashSpeed * Time.fixedDeltaTime;
+
+        while (elapsed < dashDuration)
+        {
+            // 把 0.1f 改成 dashBodySize.y * 0.5f，剛好偏移到角色中心
+            RaycastHit2D hit = Physics2D.BoxCast(
+                transform.position + new Vector3(0f, dashBodySize.y * 0.5f, 0f),
+                new Vector2(dashBodySize.x, dashBodySize.y * 0.5f), // 高度縮小一半，只掃身體中段
+                0f,
+                new Vector2(dir, 0f),
+                stepDistance,
+                dashObstacleLayer
+            );
+
+            if (hit.collider != null)
+            {
+                Debug.Log("Dash 撞到：" + hit.collider.name);
+                break;
+            }
+
+            transform.position += new Vector3(dir * stepDistance, 0f, 0f);
+            elapsed += Time.fixedDeltaTime;
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        // [新增] Dash 結束，恢復跟 Enemy 的碰撞
+        Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer_index, false);
+
+        if (playerHealth != null)
+            playerHealth.isInvincible = false;
 
         isAttacking = false;
     }
@@ -480,6 +603,5 @@ public class PlayerCombat : MonoBehaviour
         comboAttacks[0].hitBox.flipByFacingDirection = true;
         comboAttacks[0].attackDuration = 0.3f;
         comboAttacks[0].hitDelay = 0.08f;
-
     }
 }
