@@ -59,7 +59,6 @@ public class PlayerCombat : MonoBehaviour
     [Header("Input Actions")]
     public InputActionReference moveAction;
     public InputActionReference attackAction;
-    public InputActionReference skillAction;
 
     [Header("References")]
     public Transform attackPoint;
@@ -84,30 +83,15 @@ public class PlayerCombat : MonoBehaviour
     public AttackStep downAttack = new AttackStep();
     public float directionThreshold = 0.5f;
 
-    [Header("Skill")]
-    public HitBoxData skillHitBox = new HitBoxData
-    {
-        size = new Vector2(0f, 1.2f),
-        offset = new Vector2(1f, 0f),
-        damage = 3,
-        knockbackforce = 10f,
-        drawDuration = 0.15f,
-        useEffectAspect = true,
-        fitWidthByHeight = true,
-        spawnEffect = true,
-
-        effectRotationX = 0f,
-        effectRotationY = 0f,
-        effectRotationZ = 0f,
-
-        effectScaleMultiplier = 1.3f,
-        effectOffset = Vector2.zero,
-        flipByFacingDirection = true
-    };
-
-    public float skillCooldown = 2f;
-    public float skillDuration = 0.5f;
-    public float skillHitDelay = 0.15f;
+    [Header("Fireball Skill 1")]
+    public GameObject fireballPrefab;
+    public Transform fireballSpawnPoint;
+    public float fireballSpeed = 8f;
+    public int fireballDamage = 1;
+    public float fireballLifeTime = 5f;
+    public float fireballCooldown = 1f;
+    public float fireballTargetRadius = 6f;
+    public LayerMask fireballObstacleLayer;
 
     // ─────────────────────────────────────────
     // [新增] Dash 設定
@@ -142,7 +126,7 @@ public class PlayerCombat : MonoBehaviour
     private int comboIndex = 0;
     private bool isAttacking = false;
     private float lastAttackTime = -999f;
-    private float skillTimer = 0f;
+    private float fireballCooldownTimer = 0f;
 
     private PlayerController playerController;
 
@@ -172,14 +156,9 @@ public class PlayerCombat : MonoBehaviour
             attackAction.action.Enable();
         }
 
-        if (skillAction != null && skillAction.action != null)
-        {
-            skillAction.action.performed += OnSkill;
-            skillAction.action.Enable();
-        }
-
         // [新增] 啟用 C 鍵 Dash 監聽
         dashInput.Player.Crouch.performed += OnDash;
+        dashInput.Player.Skill1.performed += OnSkill1;
         dashInput.Enable();
     }
 
@@ -194,21 +173,16 @@ public class PlayerCombat : MonoBehaviour
             attackAction.action.Disable();
         }
 
-        if (skillAction != null && skillAction.action != null)
-        {
-            skillAction.action.performed -= OnSkill;
-            skillAction.action.Disable();
-        }
-
         // [新增] 停用 C 鍵 Dash 監聽
         dashInput.Player.Crouch.performed -= OnDash;
+        dashInput.Player.Skill1.performed -= OnSkill1;
         dashInput.Disable();
     }
 
     private void Update()
     {
-        if (skillTimer > 0f)
-            skillTimer -= Time.deltaTime;
+        if (fireballCooldownTimer > 0f)
+            fireballCooldownTimer = Mathf.Max(0f, fireballCooldownTimer - Time.deltaTime);
 
         // [新增] Dash 冷卻倒數
         if (dashCooldownTimer > 0f)
@@ -246,12 +220,12 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
-    private void OnSkill(InputAction.CallbackContext context)
+    private void OnSkill1(InputAction.CallbackContext context)
     {
-        if (isAttacking || skillTimer > 0f)
+        if (fireballCooldownTimer > 0f)
             return;
 
-        StartCoroutine(SkillRoutine());
+        SpawnFireball();
     }
 
     // ─────────────────────────────────────────
@@ -286,6 +260,80 @@ public class PlayerCombat : MonoBehaviour
         lastAttackTime = Time.time;
     }
 
+    private void SpawnFireball()
+    {
+        if (fireballPrefab == null)
+        {
+            Debug.LogWarning("Fireball prefab is not assigned.");
+            return;
+        }
+
+        fireballCooldownTimer = fireballCooldown;
+
+        int dir = GetFacingDirection();
+        Vector2 direction = new Vector2(dir, 0f);
+        Vector2 playerCenter = GetPlayerCenter();
+        Vector2 spawnPosition = fireballSpawnPoint != null
+            ? (Vector2)fireballSpawnPoint.position
+            : playerCenter;
+
+        Transform target = FindNearestEnemyTarget(playerCenter);
+        GameObject fireballObject = Instantiate(fireballPrefab, spawnPosition, Quaternion.identity);
+        fireball fireballScript = fireballObject.GetComponent<fireball>();
+
+        if (fireballScript == null)
+        {
+            Debug.LogWarning("Fireball prefab does not have a fireball component.");
+            return;
+        }
+
+        fireballScript.Init(
+            fireballSpeed,
+            direction,
+            target,
+            enemyLayer,
+            fireballObstacleLayer,
+            fireballDamage,
+            fireballLifeTime
+        );
+    }
+
+    private Transform FindNearestEnemyTarget(Vector2 center)
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, fireballTargetRadius, enemyLayer);
+        EnemyHealth nearestEnemy = null;
+        float nearestDistanceSqr = float.MaxValue;
+
+        foreach (Collider2D hit in hits)
+        {
+            EnemyHealth enemyHealth = hit.GetComponentInParent<EnemyHealth>();
+
+            if (enemyHealth == null)
+                continue;
+
+            Vector2 enemyCenter = hit.bounds.center;
+            float distanceSqr = (enemyCenter - center).sqrMagnitude;
+
+            if (distanceSqr < nearestDistanceSqr)
+            {
+                nearestDistanceSqr = distanceSqr;
+                nearestEnemy = enemyHealth;
+            }
+        }
+
+        return nearestEnemy != null ? nearestEnemy.transform : null;
+    }
+
+    private Vector2 GetPlayerCenter()
+    {
+        Collider2D playerCollider = GetComponent<Collider2D>();
+
+        if (playerCollider != null)
+            return playerCollider.bounds.center;
+
+        return transform.position;
+    }
+
     private IEnumerator AttackRoutine(AttackStep step, int attackIndex)
     {
         isAttacking = true;
@@ -301,26 +349,6 @@ public class PlayerCombat : MonoBehaviour
         DoHit(step.hitBox);
 
         float remainTime = step.attackDuration - step.hitDelay;
-
-        if (remainTime > 0f)
-            yield return new WaitForSeconds(remainTime);
-
-        isAttacking = false;
-    }
-
-    private IEnumerator SkillRoutine()
-    {
-        isAttacking = true;
-        skillTimer = skillCooldown;
-
-        if (animator != null)
-            animator.SetTrigger("skill");
-
-        yield return new WaitForSeconds(skillHitDelay);
-
-        DoHit(skillHitBox);
-
-        float remainTime = skillDuration - skillHitDelay;
 
         if (remainTime > 0f)
             yield return new WaitForSeconds(remainTime);

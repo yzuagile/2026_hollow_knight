@@ -41,7 +41,7 @@ public class CatAssaultAI : MonoBehaviour, IDamageable
 
         if (distance < detectDistance)
         {
-            animator.SetBool("awake", true);
+            //animator.SetBool("awake", true);
             FlipSprite(); 
 
             if (Time.time > lastRushTime + rushCooldown && distance < 4f)
