@@ -7,6 +7,7 @@ public class PlayerHealth : MonoBehaviour
     public int currentHealth = 100;
     public Slider healthSlider; // 在 Inspector 把 Slider 拖進來
     public float hitAnimeTime = 0.2f;
+    [SerializeField] private GameObject gameoverPanel; // 被攻擊時的特效預置物，記得在 Inspector 指定
 
     // ─────────────────────────────────────────
     // [新增] Dash 無敵用的 flag
@@ -74,5 +75,19 @@ public class PlayerHealth : MonoBehaviour
         healthSlider.value = currentHealth; // 更新 UI
         Debug.Log("撞到怪了，剩餘血量：" + currentHealth);
         StartCoroutine(FlashRed(0.2f));
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log("玩家死亡");
+        Time.timeScale = 0f; // 暫停遊戲
+        if (gameoverPanel != null)
+        {
+            gameoverPanel.SetActive(true); // 顯示 Game Over 面板
+        }
     }
 }
