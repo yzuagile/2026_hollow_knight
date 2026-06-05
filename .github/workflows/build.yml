@@ -29,6 +29,7 @@ jobs:
             Library-
 
       - name: Run EditMode tests
+        id: editmode-tests
         uses: game-ci/unity-test-runner@v4
         env:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
@@ -37,13 +38,17 @@ jobs:
         with:
           unityVersion: 6000.3.13f1
           testMode: EditMode
+          artifactsPath: ${{ runner.temp }}/unity-test-results
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results-editmode
-          path: artifacts
+          path: ${{ steps.editmode-tests.outputs.artifactsPath }}
+
+      - name: Reset test runner package changes
+        run: git restore -- Packages/manifest.json Packages/packages-lock.json
 
       - name: Build project
         uses: game-ci/unity-builder@v4
