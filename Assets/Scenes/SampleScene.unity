@@ -6216,6 +6216,7 @@ GameObject:
   - component: {fileID: 1781023665}
   - component: {fileID: 1781023666}
   - component: {fileID: 1781023667}
+  - component: {fileID: 1781023668}
   m_Layer: 6
   m_Name: Enemy2_Visual
   m_TagString: Untagged
@@ -6439,6 +6440,20 @@ MonoBehaviour:
   poopPrefab: {fileID: 1713654872196134605, guid: af891bbeaa0805e4992af3279522842b, type: 3}
   dropPoint: {fileID: 367991929}
   dropInterval: 2
+--- !u!114 &1781023668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1781023659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6167dee898d1d548bc1baadeb6f32a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::fireballHitable
+  canBeTargeted: 1
+  targetPoint: {fileID: 0}
 --- !u!1 &1805151294
 GameObject:
   m_ObjectHideFlags: 0
