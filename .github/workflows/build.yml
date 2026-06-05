@@ -39,6 +39,7 @@ jobs:
           unityVersion: 6000.3.13f1
           testMode: EditMode
           artifactsPath: unity-test-results
+          runAsHostUser: true
 
       - name: Upload test results
         if: always()
@@ -49,7 +50,7 @@ jobs:
 
       - name: Reset test runner package changes
         run: |
-          rm -rf unity-test-results
+          sudo rm -rf unity-test-results
           git restore -- Packages/manifest.json Packages/packages-lock.json
 
       - name: Build project
