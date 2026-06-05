@@ -2,13 +2,16 @@ name: Build Game
 
 on:
   push:
-    branches: [ main ]
+  pull_request:
   workflow_dispatch:
 
 jobs:
   build:
     name: Build for Windows
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     strategy:
       fail-fast: false
       matrix:
@@ -39,6 +42,8 @@ jobs:
           unityVersion: 6000.3.13f1
           testMode: EditMode
           artifactsPath: unity-test-results
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: EditMode Test Results
           runAsHostUser: true
 
       - name: Upload test results
