@@ -277,7 +277,7 @@ public class PlayerCombat : MonoBehaviour
             ? (Vector2)fireballSpawnPoint.position
             : playerCenter;
 
-        Transform target = FindNearestEnemyTarget(playerCenter);
+        Transform target = FindNearestFireballTarget(playerCenter);
         GameObject fireballObject = Instantiate(fireballPrefab, spawnPosition, Quaternion.identity);
         fireball fireballScript = fireballObject.GetComponent<fireball>();
 
@@ -298,30 +298,29 @@ public class PlayerCombat : MonoBehaviour
         );
     }
 
-    private Transform FindNearestEnemyTarget(Vector2 center)
+    private Transform FindNearestFireballTarget(Vector2 center)
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(center, fireballTargetRadius, enemyLayer);
-        EnemyHealth nearestEnemy = null;
+        fireballHitable nearestTarget = null;
         float nearestDistanceSqr = float.MaxValue;
 
         foreach (Collider2D hit in hits)
         {
-            EnemyHealth enemyHealth = hit.GetComponentInParent<EnemyHealth>();
+            fireballHitable fireballTarget = hit.GetComponentInParent<fireballHitable>();
 
-            if (enemyHealth == null)
+            if (fireballTarget == null || !fireballTarget.canBeTargeted)
                 continue;
 
-            Vector2 enemyCenter = hit.bounds.center;
-            float distanceSqr = (enemyCenter - center).sqrMagnitude;
+            float distanceSqr = (fireballTarget.TargetCenter - center).sqrMagnitude;
 
             if (distanceSqr < nearestDistanceSqr)
             {
                 nearestDistanceSqr = distanceSqr;
-                nearestEnemy = enemyHealth;
+                nearestTarget = fireballTarget;
             }
         }
 
-        return nearestEnemy != null ? nearestEnemy.transform : null;
+        return nearestTarget != null ? nearestTarget.TargetTransform : null;
     }
 
     private Vector2 GetPlayerCenter()

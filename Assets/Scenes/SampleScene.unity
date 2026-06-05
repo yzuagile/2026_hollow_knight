@@ -1082,7 +1082,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: c7380b8977a55534ebf405a0b795a519, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2313,6 +2313,7 @@ GameObject:
   - component: {fileID: 787018746}
   - component: {fileID: 787018745}
   - component: {fileID: 787018747}
+  - component: {fileID: 787018748}
   m_Layer: 6
   m_Name: EnemyContain
   m_TagString: Enemy
@@ -2442,6 +2443,20 @@ MonoBehaviour:
   healthBar: {fileID: 863143543}
   lastHitTime: 0
   stunDuration: 0.2
+--- !u!114 &787018748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787018742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6167dee898d1d548bc1baadeb6f32a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::fireballHitable
+  canBeTargeted: 1
+  targetPoint: {fileID: 0}
 --- !u!1 &791364010
 GameObject:
   m_ObjectHideFlags: 0
@@ -4246,6 +4261,7 @@ GameObject:
   - component: {fileID: 1331917248}
   - component: {fileID: 1331917247}
   - component: {fileID: 1331917246}
+  - component: {fileID: 1331917250}
   m_Layer: 6
   m_Name: EnemyContain (2)
   m_TagString: Enemy
@@ -4375,6 +4391,20 @@ MonoBehaviour:
   enemyHealth: {fileID: 0}
   EnemyVisual: {fileID: 794888201}
   stopDistance: 0.5
+--- !u!114 &1331917250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331917244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6167dee898d1d548bc1baadeb6f32a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::fireballHitable
+  canBeTargeted: 1
+  targetPoint: {fileID: 0}
 --- !u!1 &1338680507
 GameObject:
   m_ObjectHideFlags: 0
@@ -4661,7 +4691,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1519131886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6228,6 +6258,7 @@ GameObject:
   - component: {fileID: 1933336515}
   - component: {fileID: 1933336514}
   - component: {fileID: 1933336513}
+  - component: {fileID: 1933336517}
   m_Layer: 6
   m_Name: EnemyContain (1)
   m_TagString: Enemy
@@ -6357,6 +6388,20 @@ MonoBehaviour:
   enemyHealth: {fileID: 0}
   EnemyVisual: {fileID: 727912737}
   stopDistance: 0.5
+--- !u!114 &1933336517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933336511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6167dee898d1d548bc1baadeb6f32a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::fireballHitable
+  canBeTargeted: 1
+  targetPoint: {fileID: 0}
 --- !u!1 &1955787943
 GameObject:
   m_ObjectHideFlags: 0

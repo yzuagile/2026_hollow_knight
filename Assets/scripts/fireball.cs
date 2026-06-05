@@ -107,7 +107,12 @@ public class fireball : MonoBehaviour
     {
         if (IsInLayerMask(other.gameObject.layer, data.enemyLayer))
         {
-            EnemyHealth enemyHealth = other.GetComponentInParent<EnemyHealth>();
+            fireballHitable hitable = other.GetComponentInParent<fireballHitable>();
+
+            if (hitable == null)
+                return;
+
+            EnemyHealth enemyHealth = hitable.GetComponentInParent<EnemyHealth>();
 
             if (enemyHealth != null)
                 enemyHealth.TakeDamage(data.damage);
