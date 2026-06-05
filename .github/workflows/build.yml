@@ -56,6 +56,11 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: EditMode Test Results
           runAsHostUser: true
+          customParameters: >
+            -enableCodeCoverage
+            -coverageResultsPath coverage-results
+            -coverageOptions
+            "generateAdditionalReports;generateHtmlReport;generateBadgeReport;assemblyFilters:+Game"
 
       - name: Upload test results
         if: matrix.jobType == 'editmode-tests'
@@ -63,6 +68,22 @@ jobs:
         with:
           name: test-results-editmode
           path: ${{ steps.editmode-tests.outputs.artifactsPath }}
+
+      - name: Upload coverage report
+        if: ${{ matrix.jobType == 'editmode-tests' && (success() || failure()) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-editmode
+          path: coverage-results
+
+      - name: Publish coverage summary to Checks
+        if: ${{ matrix.jobType == 'editmode-tests' && (success() || failure()) }}
+        uses: dorny/test-reporter@v1
+        with:
+          name: Code Coverage
+          path: coverage-results/**/Cobertura.xml
+          reporter: dotnet-cobertura
+          fail-on-error: false
 
       - name: Reset test runner package changes
         if: matrix.jobType == 'editmode-tests'
