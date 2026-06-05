@@ -38,7 +38,7 @@ jobs:
       - name: Run EditMode tests
         if: matrix.jobType == 'editmode-tests'
         id: editmode-tests
-        uses: game-ci/unity-test-runner@v5
+        uses: game-ci/unity-test-runner@v4
         timeout-minutes: 20
         env:
           # 授權設定說明：
