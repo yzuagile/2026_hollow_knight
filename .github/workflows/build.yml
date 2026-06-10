@@ -78,12 +78,17 @@ jobs:
 
       - name: Publish coverage summary to Checks
         if: ${{ matrix.jobType == 'editmode-tests' && (success() || failure()) }}
-        uses: dorny/test-reporter@v1
+        uses: irongut/CodeCoverageSummary@v1
         with:
-          name: Code Coverage
-          path: coverage-results/**/Cobertura.xml
-          reporter: dotnet-cobertura
-          fail-on-error: false
+          filename: coverage-results/**/Cobertura.xml
+          badge: true
+          fail_build_min: 0
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '60 80'
 
       - name: Reset test runner package changes
         if: matrix.jobType == 'editmode-tests'
