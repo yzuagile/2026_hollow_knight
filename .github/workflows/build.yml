@@ -78,7 +78,7 @@ jobs:
 
       - name: Publish coverage summary to Checks
         if: ${{ matrix.jobType == 'editmode-tests' && (success() || failure()) }}
-        uses: irongut/CodeCoverageSummary@v1
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           filename: coverage-results/**/Cobertura.xml
           badge: true
