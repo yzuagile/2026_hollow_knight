@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerMana))]
 public class PlayerCombat : MonoBehaviour
 {
     // 你的攻擊特效圖片比例：1672 x 941
@@ -93,6 +94,11 @@ public class PlayerCombat : MonoBehaviour
     public float fireballTargetRadius = 6f;
     public LayerMask fireballObstacleLayer;
 
+    [Header("Mana")]
+    public int currentMana = 0;
+    public int fireballManaCost = 20;
+    public int normalAttackManaRestore = 10;
+
     // ─────────────────────────────────────────
     // [新增] Dash 設定
     // dashSpeed      : 位移速度，數字越大衝越快
@@ -117,6 +123,7 @@ public class PlayerCombat : MonoBehaviour
     // [新增] 引用 PlayerHealth 以控制無敵狀態
     // ─────────────────────────────────────────
     private PlayerHealth playerHealth;
+    private PlayerMana playerMana;
 
     // ─────────────────────────────────────────
     // [新增] 用來監聽 C 鍵（Crouch Action）的 Input
@@ -134,6 +141,8 @@ public class PlayerCombat : MonoBehaviour
     {
         playerController = GetComponent<PlayerController>();
         playerHealth = GetComponent<PlayerHealth>(); // [新增] 取得 PlayerHealth
+        playerMana = GetComponent<PlayerMana>();
+        currentMana = playerMana != null ? playerMana.currentMana : 0;
 
         if (animator == null)
             animator = GetComponent<Animator>();
@@ -181,6 +190,9 @@ public class PlayerCombat : MonoBehaviour
 
     private void Update()
     {
+        if (playerMana != null)
+            currentMana = playerMana.currentMana;
+
         if (fireballCooldownTimer > 0f)
             fireballCooldownTimer = Mathf.Max(0f, fireballCooldownTimer - Time.deltaTime);
 
@@ -225,7 +237,23 @@ public class PlayerCombat : MonoBehaviour
         if (fireballCooldownTimer > 0f)
             return;
 
-        SpawnFireball();
+        if (playerMana == null)
+        {
+            Debug.LogWarning("PlayerMana component is missing.");
+            return;
+        }
+
+        if (!playerMana.CanUseMana(fireballManaCost))
+        {
+            Debug.Log("Not enough mana.");
+            return;
+        }
+
+        if (SpawnFireball())
+        {
+            playerMana.TryUseMana(fireballManaCost);
+            currentMana = playerMana.currentMana;
+        }
     }
 
     // ─────────────────────────────────────────
@@ -260,15 +288,13 @@ public class PlayerCombat : MonoBehaviour
         lastAttackTime = Time.time;
     }
 
-    private void SpawnFireball()
+    private bool SpawnFireball()
     {
         if (fireballPrefab == null)
         {
             Debug.LogWarning("Fireball prefab is not assigned.");
-            return;
+            return false;
         }
-
-        fireballCooldownTimer = fireballCooldown;
 
         int dir = GetFacingDirection();
         Vector2 direction = new Vector2(dir, 0f);
@@ -284,7 +310,8 @@ public class PlayerCombat : MonoBehaviour
         if (fireballScript == null)
         {
             Debug.LogWarning("Fireball prefab does not have a fireball component.");
-            return;
+            Destroy(fireballObject);
+            return false;
         }
 
         fireballScript.Init(
@@ -296,6 +323,9 @@ public class PlayerCombat : MonoBehaviour
             fireballDamage,
             fireballLifeTime
         );
+
+        fireballCooldownTimer = fireballCooldown;
+        return true;
     }
 
     private Transform FindNearestFireballTarget(Vector2 center)
@@ -453,9 +483,19 @@ public class PlayerCombat : MonoBehaviour
             {
                 damageable.TakeDamage(hitBox.damage);
                 damageable.TakeKnockback(hitBox.knockbackforce, new Vector2(hitBox.forceDir.x * dir, hitBox.forceDir.y));
+                RestoreManaFromNormalAttack();
                 Debug.Log("Hit: " + hit.name);
             }
         }
+    }
+
+    private void RestoreManaFromNormalAttack()
+    {
+        if (playerMana == null)
+            return;
+
+        playerMana.RestoreMana(normalAttackManaRestore);
+        currentMana = playerMana.currentMana;
     }
 
     private int GetFacingDirection()
