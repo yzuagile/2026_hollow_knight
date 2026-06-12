@@ -207,7 +207,7 @@ public class PlayerCombat : MonoBehaviour
 
     private void OnAttack(InputAction.CallbackContext context)
     {
-        if (isAttacking)
+        if (isAttacking && playerController.IsBlocking)
             return;
 
         Vector2 moveInput = Vector2.zero;
