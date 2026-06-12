@@ -6,6 +6,7 @@ public class EnemyPoopDropper : MonoBehaviour
     [SerializeField] private GameObject poopPrefab;
     [SerializeField] private Transform dropPoint;
     [SerializeField] private float dropInterval = 2f;
+    [SerializeField] private int maxUnflattenedPoop = 3;
 
     private float timer = 0f;
 
@@ -25,6 +26,11 @@ public class EnemyPoopDropper : MonoBehaviour
         if (poopPrefab == null || dropPoint == null)
         {
             Debug.LogWarning("Poop Prefab 或 DropPoint 沒有設定");
+            return;
+        }
+
+        if (Poop.activeUnflattenedPoopCount >= maxUnflattenedPoop)
+        {
             return;
         }
 

@@ -182,3 +182,5 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
+  disappearAfterFlatten: 2
+  flattenedScale: {x: 1.4, y: 0.35, z: 1}

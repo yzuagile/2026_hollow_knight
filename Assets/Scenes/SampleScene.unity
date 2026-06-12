@@ -7274,6 +7274,7 @@ MonoBehaviour:
   poopPrefab: {fileID: 1713654872196134605, guid: af891bbeaa0805e4992af3279522842b, type: 3}
   dropPoint: {fileID: 367991929}
   dropInterval: 2
+  maxUnflattenedPoop: 5
 --- !u!114 &1781023668
 MonoBehaviour:
   m_ObjectHideFlags: 0
